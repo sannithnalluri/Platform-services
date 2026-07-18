@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+dollar: '$'
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: food-service
+          uri: lb://FOOD-SERVICE
+          predicates:
+            - Path=/food-service/**
+          filters:
+            - RewritePath=/food-service/(?<segment>.*), /${dollar}{segment}
+        - id: order-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/order-service/**
+          filters:
+            - RewritePath=/order-service/(?<segment>.*), /${dollar}{segment}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - name: Food Service
+        url: /food-service/v3/api-docs
+      - name: Order Service
+        url: /order-service/v3/api-docs
